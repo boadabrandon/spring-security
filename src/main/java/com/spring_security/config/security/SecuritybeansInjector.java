@@ -14,6 +14,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class SecuritybeansInjector {
 
+    private final UserRepository userRepository;
+
+    public SecuritybeansInjector(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
     @Bean
     public AuthenticationManager authenticationManager (AuthenticationConfiguration authenticationConfiguration) throws Exception{
         return authenticationConfiguration.getAuthenticationManager(); //ProviderManager implements AuthenticationManager
@@ -22,9 +28,8 @@ public class SecuritybeansInjector {
     @Bean
     private AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(null);
-        provider.setPasswordEncoder();
-
+        provider.setUserDetailsService(userDetailsService());
+        provider.setPasswordEncoder(passwordEncoder());
         return provider;
     }
 
@@ -34,7 +39,7 @@ public class SecuritybeansInjector {
     }
 
     @Bean
-    public UserDetailsService userDetailsService(UserRepository userRepository){
+    public UserDetailsService userDetailsService(){
         return username -> {
             return userRepository.findByUsername(username)
                     .orElseThrow(() -> new RuntimeException("User not found"));
