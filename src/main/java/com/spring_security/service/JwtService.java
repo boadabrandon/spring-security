@@ -1,12 +1,13 @@
 package com.spring_security.service;
 
 import com.spring_security.entity.User;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Header;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import lombok.Value;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
@@ -28,7 +29,7 @@ public class JwtService {
         Date expiration = new Date(issuedAt.getTime() + (EXPIRATION_MINUTES  * 60 * 1000));
 
         //VERSION NO DEPRECADA
-        Jwts.builder()
+        return Jwts.builder()
                 .claims()
                     .add(extraClaims)
                     .and()
@@ -41,7 +42,8 @@ public class JwtService {
                 .signWith(generateKey(), SignatureAlgorithm.HS256)
                 .compact();
 
-        //VERSION DEPRECADA
+        /*
+        VERSION DEPRECADA
         Jwts.builder()
                 .setClaims(extraClaims)
                 .setSubject(user.getName())
@@ -50,11 +52,20 @@ public class JwtService {
                 .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
                 .signWith(generateKey(), SignatureAlgorithm.HS256)
                 .compact();
+        */
     }
 
     private Key generateKey(){
-
         byte[] secretAsBytes = Decoders.BASE64.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(secretAsBytes);
+    }
+
+    public String extractUsername(String jwt) {
+        return extractAllClaims(jwt).getSubject();
+    }
+
+    private Claims extractAllClaims(String jwt) {
+        return Jwts.parserBuilder().setSigningKey(generateKey()).build()
+                .parseClaimsJws(jwt).getBody();
     }
 }
