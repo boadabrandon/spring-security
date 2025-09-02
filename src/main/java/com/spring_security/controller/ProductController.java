@@ -1,7 +1,6 @@
 package com.spring_security.controller;
 
 import com.spring_security.entity.Product;
-import com.spring_security.repository.ProductRepository;
 import com.spring_security.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
