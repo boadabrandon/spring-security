@@ -29,7 +29,7 @@ public class JwtService {
 
          return Jwts.builder()
             .claims(extraClaims)
-            .subject(user.getName())
+            .subject(user.getUsername())
             .issuedAt(issuedAt)
             .expiration(expiration)
             .header().type("JWT").and()
